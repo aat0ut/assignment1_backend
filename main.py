@@ -38,3 +38,20 @@ def create_task(task: Tasks):
     if task:
         tasks.append(task)
         return {'id': task['id'], 'title':task['title'], 'done': task['done']}
+
+@app.put("/tasks/{req_id}")
+def update_task(req_id: int, title: str, done: bool):
+    for task in tasks:
+        if task.get('id')==req_id:
+            task['title']=title
+            task['done']=done
+            return task
+    return {"Error": f"Task with id: {req_id} does not exist"}
+
+@app.delete("/tasks/{req_id}")
+def del_task(req_id: int):
+    for task in tasks:
+        if task['id']==req_id:
+            del tasks[tasks.index(task)]
+            return {"Done":f"Task wit id {req_id} has been deleted"}
+    return {"Error": f"Task with id: {req_id} does not exist"}
