@@ -31,3 +31,10 @@ def return_task_id(req_id: int):
 @app.get("/health")
 def return_health():
     return {'status':"OK"}
+
+# No need for explicit validation since Tasks enforces not null values
+@app.post("/tasks/")
+def create_task(task: Tasks):
+    if task:
+        tasks.append(task)
+        return {'id': task['id'], 'title':task['title'], 'done': task['done']}
