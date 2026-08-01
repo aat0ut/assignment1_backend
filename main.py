@@ -20,38 +20,39 @@ tasks=[
 
 @app.get("/tasks")
 def return_tasks():
-    return tasks
+    return {"200":tasks}
 
 @app.get("/tasks/{req_id}")
 def return_task_id(req_id: int):
     if req_id is None or req_id not in (task.get('id') for task in tasks):
-        return { "error": "Task 99 not found" }
+        return { "ERROR CODE 404": f"Task {req_id} not found" }
     else:
-        return (task for task in tasks if task["id"]==req_id)
+        return {"200":(task for task in tasks if task["id"]==req_id)}
 @app.get("/health")
 def return_health():
-    return {'status':"OK"}
+    return {"200":"read",'status':"ok"}
 
 # No need for explicit validation since Tasks enforces not null values
 @app.post("/tasks/")
 def create_task(task: Tasks):
     if task:
         tasks.append(task)
-        return {'id': task['id'], 'title':task['title'], 'done': task['done']}
-
+        return {"200":{'id': task['id'], 'title': task['title'], 'done': task['done']}}
+    else:
+        return {"404":"Invalid ID"}
 @app.put("/tasks/{req_id}")
 def update_task(req_id: int, title: str, done: bool):
     for task in tasks:
         if task.get('id')==req_id:
             task['title']=title
             task['done']=done
-            return task
-    return {"Error": f"Task with id: {req_id} does not exist"}
+            return {"200":task}
+    return {"Error 404": f"Task with id: {req_id} does not exist"}
 
 @app.delete("/tasks/{req_id}")
 def del_task(req_id: int):
     for task in tasks:
         if task['id']==req_id:
             del tasks[tasks.index(task)]
-            return {"Done":f"Task wit id {req_id} has been deleted"}
-    return {"Error": f"Task with id: {req_id} does not exist"}
+            return {"204":f"Task wit id {req_id} has been deleted"}
+    return {"Error 404": f"Task with id: {req_id} does not exist"}
